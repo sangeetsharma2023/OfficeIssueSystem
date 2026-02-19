@@ -1,0 +1,63 @@
+{% extends "issues/base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3><i class="bi bi-folder"></i> {{ issue.title }}</h3>
+    <a href="{% url 'print_issue' issue.pk %}" class="btn btn-secondary">
+        <i class="bi bi-printer"></i> Print History
+    </a>
+
+    <a href="{% url 'add_event' issue.pk %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Add Event
+    </a>
+</div>
+
+{% for e in events %}
+
+<div class="timeline-card">
+
+    <div class="d-flex justify-content-between">
+        <strong>
+            {{ e.event_date }} —
+            {% if e.event_type == 'received' %}
+                <i class="bi bi-envelope-arrow-down text-success"></i>
+            {% elif e.event_type == 'sent' %}
+                <i class="bi bi-envelope-arrow-up text-danger"></i>
+            {% elif e.event_type == 'meeting' %}
+                <i class="bi bi-people"></i>
+            {% else %}
+                <i class="bi bi-journal-text"></i>
+            {% endif %}
+            {{ e.get_event_type_display }}
+        </strong>
+
+        <small class="text-muted">{{ e.created_by }}</small>
+    </div>
+
+    <h5 class="mt-2">{{ e.short_note }}</h5>
+    <p>{{ e.detailed_note }}</p>
+
+    {% if e.file_name %}
+        <div><b><i class="bi bi-folder"></i> File:</b> {{ e.file_name }}</div>
+    {% endif %}
+
+    {% if e.letter_no %}
+        <div><b><i class="bi bi-hash"></i> Letter No:</b> {{ e.letter_no }}</div>
+    {% endif %}
+
+    {% if e.sender %}
+        <div><b><i class="bi bi-person"></i> From:</b> {{ e.sender }}</div>
+        <div class="text-muted">{{ e.sender_address }}</div>
+    {% endif %}
+
+    <div class="mt-2">
+        {% for r in e.references.all %}
+            <span class="ref-badge">{{ r.ref_type }}/{{ r.ref_value }}</span>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endfor %}
+
+{% endblock %}

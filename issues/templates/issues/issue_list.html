@@ -1,0 +1,59 @@
+{% extends "issues/base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between mb-3">
+    <h3><i class="bi bi-list-task"></i> All Issues</h3>
+    <div class="mb-2">
+    {% for t in i.tags.all %}
+        <span class="badge bg-warning text-dark">{{ t.name }}</span>
+    {% endfor %}
+    </div>
+
+    <a href="{% url 'add_issue' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> New Issue
+    </a>
+</div>
+<form method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="q" value="{{ query }}"
+               class="form-control"
+               placeholder="Search by name, subject, letter no, person...">
+
+        <button class="btn btn-primary">
+            <i class="bi bi-search"></i>
+        </button>
+    </div>
+</form>
+
+<div class="row">
+{% for i in issues %}
+    <div class="col-md-6">
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <h5>
+                    <a href="{% url 'issue_detail' i.pk %}">
+                        {{ i.title }}
+                    </a>
+                </h5>
+                <span class="badge bg-info">{{ i.status }}</span>
+                {% for t in i.tags.all %}
+                    <a href="/?tag={{ t.name }}" 
+                    class="badge bg-warning text-dark text-decoration-none me-1">
+                        {{ t.name }}
+                    </a>
+                {% empty %}
+                    <span class="text-muted small">No tags</span>
+                {% endfor %}
+
+
+                <br>
+                <small>Opened: {{ i.opened_on }}</small>
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <p>No issues found</p>
+{% endfor %}
+</div>
+
+{% endblock %}

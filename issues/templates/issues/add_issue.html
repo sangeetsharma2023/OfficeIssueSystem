@@ -1,0 +1,29 @@
+{% extends "issues/base.html" %}
+{% block content %}
+
+<h4><i class="bi bi-folder-plus"></i> Create New Issue</h4>
+<hr>
+
+<form method="post" class="card p-4 shadow-sm bg-white">
+{% csrf_token %}
+
+<label>Issue Title</label>
+<input type="text" name="title" class="form-control mb-3" required>
+
+<label>Description</label>
+<textarea name="description" class="form-control mb-3"></textarea>
+
+<label>Priority</label>
+<select name="priority" class="form-control mb-3">
+    <option value="">Normal</option>
+    <option>Urgent</option>
+    <option>Very Urgent</option>
+</select>
+
+<button class="btn btn-success">
+    <i class="bi bi-save"></i> Create Issue
+</button>
+
+</form>
+
+{% endblock %}

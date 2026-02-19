@@ -1,0 +1,57 @@
+{% extends "issues/base.html" %}
+{% block content %}
+
+<h3><i class="bi bi-search"></i> Search</h3>
+
+<form method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="q" value="{{ query }}"
+               class="form-control"
+               placeholder="Search anything...">
+        <button class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+{% if query %}
+
+<h5 class="mt-4">Matching Issues</h5>
+<hr>
+{% for i in issue_results %}
+    <div class="card mb-2 p-2">
+        <a href="{% url 'issue_detail' i.pk %}">
+            <b>{{ i.title }}</b>
+        </a>
+    </div>
+{% empty %}
+    <p class="text-muted">No issue matches</p>
+{% endfor %}
+
+
+<h5 class="mt-4">Matching Events</h5>
+<hr>
+{% for e in event_results %}
+    <div class="card mb-2 p-2">
+
+        <a href="{% url 'issue_detail' e.issue.pk %}?open={{ e.id }}#ev{{ e.id }}">
+
+            <b>{{ e.short_note }}</b>
+        </a>
+
+        <br>
+        <small>
+            Issue: {{ e.issue.title }} |
+            {{ e.event_date }}
+        </small>
+
+        <div class="text-muted">
+            {{ e.detailed_note|truncatechars:120 }}
+        </div>
+
+    </div>
+{% empty %}
+    <p class="text-muted">No event matches</p>
+{% endfor %}
+
+{% endif %}
+
+{% endblock %}

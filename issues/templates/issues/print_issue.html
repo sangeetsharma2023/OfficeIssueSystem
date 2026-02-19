@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Issue History</title>
+    <style>
+        body { font-family: Arial; line-height:1.5; }
+        .event { margin-bottom:18px; }
+        .ref { font-size:12px; color:#444; }
+        @media print { button { display:none; } }
+    </style>
+</head>
+<body>
+
+<h2>Issue History</h2>
+<h3>{{ issue.title }}</h3>
+<hr>
+
+{% for e in events %}
+
+<div class="event">
+    <b>{{ e.event_date }} — {{ e.get_event_type_display }}</b><br>
+
+    <b>{{ e.short_note }}</b><br>
+
+    {{ e.detailed_note }}<br>
+
+    {% if e.file_name %}
+    File: {{ e.file_name }}<br>
+    {% endif %}
+
+    {% if e.letter_no %}
+    Letter No: {{ e.letter_no }}<br>
+    {% endif %}
+
+    {% if e.sender %}
+    From: {{ e.sender }}<br>
+    {{ e.sender_address }}<br>
+    {% endif %}
+
+    <div class="ref">
+    References:
+    {% for r in e.references.all %}
+        {{ r.ref_type }}/{{ r.ref_value }},
+    {% empty %}
+        None
+    {% endfor %}
+    </div>
+
+    <small>Entered by {{ e.created_by }}</small>
+
+</div>
+
+{% endfor %}
+
+<br>
+<button onclick="window.print()">Print</button>
+
+</body>
+</html>

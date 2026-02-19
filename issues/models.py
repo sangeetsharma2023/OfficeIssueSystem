@@ -1,0 +1,78 @@
+from django.db import models
+from django.contrib.auth.models import User
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Issue(models.Model):
+    title = models.CharField(max_length=300)
+    description = models.TextField(blank=True)
+
+    opened_on = models.DateField(auto_now_add=True)
+    closed_on = models.DateField(null=True, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+
+    status = models.CharField(max_length=50, default="Open")
+    priority = models.CharField(max_length=20, blank=True)
+
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='issue_created')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+
+class Event(models.Model):
+    EVENT_TYPES = [
+        ('note', 'General Note'),
+        ('received', 'Letter Received'),
+        ('sent', 'Letter Issued'),
+        ('discussion', 'Discussion'),
+        ('meeting', 'Meeting'),
+        ('update', 'Update'),
+    ]
+
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name='events')
+
+    event_date = models.DateField()
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPES)
+
+    short_note = models.CharField(max_length=300)
+    detailed_note = models.TextField(blank=True)
+
+    file_name = models.CharField(max_length=200, blank=True)
+
+    # Communication fields (optional)
+    letter_no = models.CharField(max_length=200, blank=True)
+    letter_date = models.DateField(null=True, blank=True)
+    sender = models.CharField(max_length=300, blank=True)
+    sender_address = models.TextField(blank=True)
+
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.issue} - {self.short_note}"
+
+
+class Reference(models.Model):
+    REF_TYPES = [
+        ('N', 'Notesheet'),
+        ('C', 'Correspondence'),
+        ('V', 'Volume'),
+        ('P', 'Page'),
+        ('F', 'Flag'),
+        ('O', 'Other'),
+    ]
+
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='references')
+    ref_type = models.CharField(max_length=1, choices=REF_TYPES)
+    ref_value = models.CharField(max_length=50)
+    remarks = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return f"{self.ref_type}/{self.ref_value}"
