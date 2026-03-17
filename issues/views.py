@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Issue, Event, Reference
+from .models import Issue, Event, Reference, File, FileTag, Tag
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
@@ -65,13 +65,15 @@ def add_event(request, pk):
     issue = get_object_or_404(Issue, pk=pk)
 
     if request.method == 'POST':
+        file_id = request.POST.get('file')
+
         event = Event.objects.create(
             issue=issue,
+            file=File.objects.get(id=file_id) if file_id else None,
             event_date=request.POST.get('event_date'),
             event_type=request.POST.get('event_type'),
             short_note=request.POST.get('short_note'),
             detailed_note=request.POST.get('detailed_note'),
-            file_name=request.POST.get('file_name'),
             letter_no=request.POST.get('letter_no'),
             sender=request.POST.get('sender'),
             sender_address=request.POST.get('sender_address'),
@@ -89,22 +91,69 @@ def add_event(request, pk):
 
         return redirect('issue_detail', pk=issue.pk)
 
-    return render(request, 'issues/add_event.html', {'issue': issue})
+    return render(request, 'issues/add_event.html', {
+        'issue': issue,
+        'files': issue.files.all()   # 🔥 important
+    })
 
 
 @login_required
 def add_issue(request):
+    files = File.objects.all()
+
     if request.method == 'POST':
-        Issue.objects.create(
+        issue = Issue.objects.create(
             title=request.POST.get('title'),
             description=request.POST.get('description'),
             priority=request.POST.get('priority'),
             created_by=request.user
         )
+
+        # 🔥 assign selected files
+        selected_files = request.POST.getlist('files')
+        if selected_files:
+            issue.files.set(selected_files)
+
         return redirect('issue_list')
 
-    return render(request, 'issues/add_issue.html')
+    return render(request, 'issues/add_issue.html', {
+        'files': files
+    })
 
+
+@login_required
+def edit_issue(request, pk):
+    issue = get_object_or_404(Issue, pk=pk)
+    files = File.objects.all()
+
+    if request.method == 'POST':
+        issue.title = request.POST.get('title')
+        issue.description = request.POST.get('description')
+        issue.priority = request.POST.get('priority')
+        issue.status = request.POST.get('status')
+        issue.save()
+
+        # update files
+        selected_files = request.POST.getlist('files')
+        issue.files.set(selected_files)
+
+        return redirect('issue_detail', pk=issue.pk)
+
+    return render(request, 'issues/edit_issue.html', {
+        'issue': issue,
+        'files': files
+    })
+
+
+@login_required
+def delete_issue(request, pk):
+    issue = get_object_or_404(Issue, pk=pk)
+
+    if request.method == 'POST':
+        issue.delete()
+        return redirect('issue_list')
+
+    return render(request, 'issues/delete_issue.html', {'issue': issue})
 
 def user_login(request):
     error = ""
@@ -178,3 +227,135 @@ def global_search(request):
         'issue_results': issue_results,
         'event_results': event_results
     })
+
+
+@login_required
+def file_list(request):
+    files = File.objects.all().order_by('-created_at')
+    return render(request, 'issues/file_list.html', {'files': files})
+
+
+@login_required
+def add_file(request):
+    tags = FileTag.objects.all()
+
+    if request.method == 'POST':
+        file = File.objects.create(
+            file_no=request.POST.get('file_no'),
+            name=request.POST.get('name'),
+            efile_no=request.POST.get('efile_no'),
+            year=request.POST.get('year') or None,
+            description=request.POST.get('description'),
+            remark=request.POST.get('remark'),
+            physical_location=request.POST.get('physical_location'),
+            section=request.POST.get('section'),
+            status=request.POST.get('status'),
+            open_date=request.POST.get('open_date') or None,
+            close_date=request.POST.get('close_date') or None,
+        )
+
+        selected_tags = request.POST.getlist('tags')
+        if selected_tags:
+            file.tags.set(selected_tags)
+
+        return redirect('file_list')
+
+    return render(request, 'issues/add_file.html', {'tags': tags})
+
+
+@login_required
+def edit_file(request, pk):
+    file = get_object_or_404(File, pk=pk)
+    tags = FileTag.objects.all()
+
+    if request.method == 'POST':
+        file.file_no = request.POST.get('file_no')
+        file.name = request.POST.get('name')
+        file.efile_no = request.POST.get('efile_no')
+        file.year = request.POST.get('year') or None
+        file.description = request.POST.get('description')
+        file.remark = request.POST.get('remark')
+        file.physical_location = request.POST.get('physical_location')
+        file.section = request.POST.get('section')
+        file.status = request.POST.get('status')
+        file.open_date = request.POST.get('open_date') or None
+        file.close_date = request.POST.get('close_date') or None
+        file.save()
+
+        selected_tags = request.POST.getlist('tags')
+        file.tags.set(selected_tags)
+
+        return redirect('file_list')
+
+    return render(request, 'issues/edit_file.html', {
+        'file': file,
+        'tags': tags
+    })
+
+
+@login_required
+def delete_file(request, pk):
+    file = get_object_or_404(File, pk=pk)
+
+    if request.method == 'POST':
+        file.delete()
+        return redirect('file_list')
+
+    return render(request, 'issues/delete_file.html', {'file': file})
+
+
+@login_required
+def edit_event(request, pk):
+    event = get_object_or_404(Event, pk=pk)
+    issue = event.issue
+
+    # only files linked to issue
+    files = issue.files.all()
+
+    if request.method == 'POST':
+        event.event_date = request.POST.get('event_date')
+        event.event_type = request.POST.get('event_type')
+        event.short_note = request.POST.get('short_note')
+        event.detailed_note = request.POST.get('detailed_note')
+        event.letter_no = request.POST.get('letter_no')
+        event.sender = request.POST.get('sender')
+        event.sender_address = request.POST.get('sender_address')
+
+        file_id = request.POST.get('file')
+        event.file = File.objects.get(id=file_id) if file_id else None
+
+        event.save()
+
+        # update references
+        event.references.all().delete()
+        refs = request.POST.get('references')
+        if refs:
+            for r in refs.split(','):
+                r = r.strip()
+                if '/' in r:
+                    t, v = r.split('/')
+                    Reference.objects.create(
+                        event=event,
+                        ref_type=t.strip().upper(),
+                        ref_value=v.strip()
+                    )
+
+        return redirect('issue_detail', pk=issue.pk)
+
+    return render(request, 'issues/edit_event.html', {
+        'event': event,
+        'issue': issue,
+        'files': files
+    })
+
+
+@login_required
+def delete_event(request, pk):
+    event = get_object_or_404(Event, pk=pk)
+    issue_pk = event.issue.pk
+
+    if request.method == 'POST':
+        event.delete()
+        return redirect('issue_detail', pk=issue_pk)
+
+    return render(request, 'issues/delete_event.html', {'event': event})

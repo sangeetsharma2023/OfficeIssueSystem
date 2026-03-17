@@ -1,0 +1,39 @@
+{% extends "issues/base.html" %}
+{% block content %}
+
+<h4><i class="bi bi-pencil"></i> Edit Issue</h4>
+<hr>
+
+<form method="post" class="card p-4 shadow-sm bg-white">
+{% csrf_token %}
+
+<label>Title</label>
+<input type="text" name="title" value="{{ issue.title }}" class="form-control mb-3">
+
+<label>Description</label>
+<textarea name="description" class="form-control mb-3">{{ issue.description }}</textarea>
+<label>Files</label>
+<select name="files" class="form-control mb-3" multiple>
+    {% for f in files %}
+        <option value="{{ f.id }}"
+            {% if f in issue.files.all %}selected{% endif %}>
+            {{ f.file_no }} - {{ f.name }}
+        </option>
+    {% endfor %}
+</select>
+<label>Priority</label>
+<input type="text" name="priority" value="{{ issue.priority }}" class="form-control mb-3">
+
+<label>Status</label>
+<select name="status" class="form-control mb-3">
+    <option {% if issue.status == 'Open' %}selected{% endif %}>Open</option>
+    <option {% if issue.status == 'Closed' %}selected{% endif %}>Closed</option>
+</select>
+
+<button class="btn btn-success">
+    <i class="bi bi-save"></i> Update
+</button>
+
+</form>
+
+{% endblock %}

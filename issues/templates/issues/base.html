@@ -34,14 +34,32 @@
 
 <nav class="navbar navbar-dark bg-primary">
   <div class="container-fluid">
-    <span class="navbar-brand mb-0 h1">
-        <i class="bi bi-folder2-open"></i> Issue Timeline System
-    </span>
-    <a class="btn btn-light btn-sm me-2" href="/search/">
-        <i class="bi bi-search"></i> Search
-    </a>
 
-    <a class="btn btn-light btn-sm" href="/logout/">Logout</a>
+    <!-- Left side -->
+    <div class="d-flex align-items-center">
+
+        <a href="{% url 'issue_list' %}" class="navbar-brand mb-0 h1 text-decoration-none">
+            <i class="bi bi-folder2-open"></i> Issue Timeline System
+        </a>
+        <a class="btn btn-light btn-sm me-2" href="{% url 'file_list' %}">
+            <i class="bi bi-folder"></i> Files
+        </a>
+
+        
+
+    </div>
+
+    <!-- Right side -->
+    <div>
+        <a class="btn btn-light btn-sm me-2" href="{% url 'global_search' %}">
+            <i class="bi bi-search"></i> Search
+        </a>
+
+        <a class="btn btn-light btn-sm" href="{% url 'logout' %}">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+    </div>
+
   </div>
 </nav>
 

@@ -12,7 +12,18 @@
 
 <label>Description</label>
 <textarea name="description" class="form-control mb-3"></textarea>
+<label>Files</label>
+<select name="files" class="form-control mb-3" multiple>
+    {% for f in files %}
+        <option value="{{ f.id }}">
+            {{ f.file_no }} - {{ f.name }}
+        </option>
+    {% endfor %}
+</select>
 
+<small class="text-muted">
+    Hold Ctrl (Windows) or Cmd (Mac) to select multiple files
+</small>
 <label>Priority</label>
 <select name="priority" class="form-control mb-3">
     <option value="">Normal</option>

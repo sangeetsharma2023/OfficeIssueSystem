@@ -7,6 +7,44 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+class FileTag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class File(models.Model):
+
+    STATUS_CHOICES = [
+        ('Open', 'Open'),
+        ('Closed', 'Closed'),
+        ('Archived', 'Archived'),
+    ]
+
+    file_no = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=300)
+    efile_no = models.CharField(max_length=100, blank=True)
+    year = models.IntegerField(null=True, blank=True)
+
+    description = models.TextField(blank=True)
+    remark = models.TextField(blank=True)
+
+    physical_location = models.CharField(max_length=200, blank=True)
+    section = models.CharField(max_length=200, blank=True)
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
+
+    open_date = models.DateField(null=True, blank=True)
+    close_date = models.DateField(null=True, blank=True)
+
+    tags = models.ManyToManyField(FileTag, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.file_no} - {self.name}"
+
 
 class Issue(models.Model):
     title = models.CharField(max_length=300)
@@ -15,7 +53,7 @@ class Issue(models.Model):
     opened_on = models.DateField(auto_now_add=True)
     closed_on = models.DateField(null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True)
-
+    files = models.ManyToManyField(File, blank=True)
     status = models.CharField(max_length=50, default="Open")
     priority = models.CharField(max_length=20, blank=True)
 
@@ -44,7 +82,13 @@ class Event(models.Model):
     short_note = models.CharField(max_length=300)
     detailed_note = models.TextField(blank=True)
 
-    file_name = models.CharField(max_length=200, blank=True)
+    file = models.ForeignKey(
+        File,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='events'
+    )
 
     # Communication fields (optional)
     letter_no = models.CharField(max_length=200, blank=True)
@@ -76,3 +120,5 @@ class Reference(models.Model):
 
     def __str__(self):
         return f"{self.ref_type}/{self.ref_value}"
+
+

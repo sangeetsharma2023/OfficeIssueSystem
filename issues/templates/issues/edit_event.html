@@ -1,0 +1,45 @@
+{% extends "issues/base.html" %}
+{% block content %}
+
+<h4>Edit Event — {{ issue.title }}</h4>
+
+<form method="post" class="card p-4 bg-white shadow-sm">
+{% csrf_token %}
+
+<input type="date" name="event_date" value="{{ event.event_date|date:'Y-m-d' }}" class="form-control mb-2">
+
+<select name="event_type" class="form-control mb-2">
+    {% for val, label in event.EVENT_TYPES %}
+        <option value="{{ val }}" {% if event.event_type == val %}selected{% endif %}>
+            {{ label }}
+        </option>
+    {% endfor %}
+</select>
+
+<input name="short_note" value="{{ event.short_note }}" class="form-control mb-2">
+<textarea name="detailed_note" class="form-control mb-2">{{ event.detailed_note }}</textarea>
+
+<label>File</label>
+<select name="file" class="form-control mb-2">
+    <option value="">-- Select --</option>
+    {% for f in files %}
+        <option value="{{ f.id }}" {% if event.file.id == f.id %}selected{% endif %}>
+            {{ f.file_no }} - {{ f.name }}
+        </option>
+    {% endfor %}
+</select>
+
+<input name="letter_no" value="{{ event.letter_no }}" class="form-control mb-2">
+<input name="sender" value="{{ event.sender }}" class="form-control mb-2">
+<textarea name="sender_address" class="form-control mb-2">{{ event.sender_address }}</textarea>
+
+<input name="references" class="form-control mb-2"
+       value="{% for r in event.references.all %}{{ r.ref_type }}/{{ r.ref_value }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+
+<button class="btn btn-success">
+    <i class="bi bi-save"></i> Update
+</button>
+
+</form>
+
+{% endblock %}

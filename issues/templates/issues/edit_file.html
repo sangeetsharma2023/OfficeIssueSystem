@@ -1,0 +1,36 @@
+{% extends "issues/base.html" %}
+{% block content %}
+
+<h4>Create File</h4>
+<form method="post" class="card p-4 bg-white shadow-sm">
+{% csrf_token %}
+
+<input name="file_no" placeholder="File No" class="form-control mb-2">
+<input name="name" placeholder="File Name" class="form-control mb-2">
+<input name="efile_no" placeholder="E-File No" class="form-control mb-2">
+<input name="year" placeholder="Year" class="form-control mb-2">
+
+<textarea name="description" placeholder="Description" class="form-control mb-2"></textarea>
+<textarea name="remark" placeholder="Remark" class="form-control mb-2"></textarea>
+
+<input name="physical_location" placeholder="Location" class="form-control mb-2">
+<input name="section" placeholder="Section" class="form-control mb-2">
+
+<select name="status" class="form-control mb-2">
+    <option>Open</option>
+    <option>Closed</option>
+    <option>Archived</option>
+</select>
+
+<label>Tags</label>
+<select name="tags" multiple class="form-control mb-3">
+{% for t in tags %}
+    <option value="{{ t.id }}">{{ t.name }}</option>
+{% endfor %}
+</select>
+
+<button class="btn btn-success">Save</button>
+
+</form>
+
+{% endblock %}

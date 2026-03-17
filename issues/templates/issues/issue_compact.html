@@ -13,7 +13,13 @@
         <a href="{% url 'add_event' issue.pk %}" class="btn btn-primary btn-sm">
             <i class="bi bi-plus-lg"></i> Add
         </a>
+        <a href="{% url 'edit_issue' issue.pk %}" class="btn btn-warning btn-sm">
+            <i class="bi bi-pencil"></i>
+        </a>
 
+        <a href="{% url 'delete_issue' issue.pk %}" class="btn btn-danger btn-sm">
+            <i class="bi bi-trash"></i>
+        </a>
         <a href="{% url 'issue_detail_full' issue.pk %}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-card-text"></i> Detailed View
         </a>
@@ -23,7 +29,60 @@
         </a>
     </div>
 </div>
+<div class="card mb-3 shadow-sm">
 
+    <div class="card-body">
+
+        <!-- Top row -->
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-1">{{ issue.title }}</h5>
+
+                <span class="badge bg-info">{{ issue.status }}</span>
+
+                {% if issue.priority %}
+                    <span class="badge bg-danger">{{ issue.priority }}</span>
+                {% endif %}
+            </div>
+
+            <div class="text-muted small text-end">
+                Created by {{ issue.created_by }} <br>
+                {{ issue.created_at|date:"d M Y" }}
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Description -->
+        {% if issue.description %}
+            <p class="mb-2">{{ issue.description }}</p>
+        {% endif %}
+
+        <!-- Tags -->
+        {% if issue.tags.all %}
+        <div class="mb-2">
+            <b><i class="bi bi-tags"></i> Tags:</b>
+            {% for t in issue.tags.all %}
+                <span class="badge bg-warning text-dark">{{ t.name }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Files -->
+        <div>
+            <b><i class="bi bi-folder"></i> Files:</b>
+
+            {% for f in issue.files.all %}
+                <span class="badge bg-secondary">
+                    {{ f.file_no }}
+                </span>
+            {% empty %}
+                <span class="text-muted">No files</span>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
 <div class="accordion" id="timeline">
 
 {% for e in events %}
@@ -48,6 +107,15 @@
                         </span>
                     {% endfor %}
                 </div>
+                <div class="mt-2">
+                    <a href="{% url 'edit_event' e.id %}" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+
+                    <a href="{% url 'delete_event' e.id %}" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
 
                 <small class="text-muted">{{ e.get_event_type_display }}</small>
 
@@ -61,8 +129,11 @@
 
             <p>{{ e.detailed_note }}</p>
 
-            {% if e.file_name %}
-            <b>File:</b> {{ e.file_name }}<br>
+            {% if e.file %}
+                <div>
+                    <b><i class="bi bi-folder"></i> File:</b>
+                    {{ e.file.file_no }} - {{ e.file.name }}
+                </div>
             {% endif %}
 
             {% if e.letter_no %}

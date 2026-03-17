@@ -1,0 +1,44 @@
+{% extends "issues/base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between mb-3">
+    <h3><i class="bi bi-folder"></i> Files</h3>
+
+    <a href="{% url 'add_file' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> New File
+    </a>
+</div>
+
+<table class="table table-bordered bg-white">
+    <tr>
+        <th>File No</th>
+        <th>Name</th>
+        <th>Year</th>
+        <th>Status</th>
+        <th>Location</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for f in files %}
+    <tr>
+        <td>{{ f.file_no }}</td>
+        <td>{{ f.name }}</td>
+        <td>{{ f.year }}</td>
+        <td><span class="badge bg-info">{{ f.status }}</span></td>
+        <td>{{ f.physical_location }}</td>
+
+        <td>
+            <a href="{% url 'edit_file' f.pk %}" class="btn btn-sm btn-warning">
+                <i class="bi bi-pencil"></i>
+            </a>
+
+            <a href="{% url 'delete_file' f.pk %}" class="btn btn-sm btn-danger">
+                <i class="bi bi-trash"></i>
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+{% endblock %}

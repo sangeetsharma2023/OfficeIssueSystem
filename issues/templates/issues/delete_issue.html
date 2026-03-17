@@ -1,0 +1,26 @@
+{% extends "issues/base.html" %}
+{% block content %}
+
+<div class="card p-4 shadow-sm bg-white text-center">
+
+    <h4 class="text-danger">
+        <i class="bi bi-trash"></i> Delete Issue
+    </h4>
+
+    <p>Are you sure you want to delete:</p>
+
+    <h5>{{ issue.title }}</h5>
+
+    <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-danger">
+            Yes, Delete
+        </button>
+        <a href="{% url 'issue_detail' issue.pk %}" class="btn btn-secondary">
+            Cancel
+        </a>
+    </form>
+
+</div>
+
+{% endblock %}

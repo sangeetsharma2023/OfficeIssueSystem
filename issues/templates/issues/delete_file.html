@@ -1,0 +1,15 @@
+{% extends "issues/base.html" %}
+{% block content %}
+
+<div class="card p-4 text-center">
+    <h4 class="text-danger">Delete File</h4>
+    <p>{{ file }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-danger">Delete</button>
+        <a href="{% url 'file_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+{% endblock %}
