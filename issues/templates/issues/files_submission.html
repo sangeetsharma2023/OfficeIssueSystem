@@ -1,0 +1,23 @@
+{% extends "issues/base.html" %}
+{% block content %}
+
+<h3><i class="bi bi-clock-history"></i> Files Under Submission</h3>
+
+<table class="table table-bordered bg-white">
+<tr>
+    <th>File</th>
+    <th>Sent Date</th>
+    <th>Remark</th>
+</tr>
+
+{% for f in files %}
+<tr>
+    <td>{{ f.file_no }} - {{ f.name }}</td>
+    <td>{{ f.last_movement_date|date:"d M Y H:i" }}</td>
+    <td>{{ f.last_movement_remark }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+{% endblock %}

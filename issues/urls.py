@@ -16,7 +16,10 @@ urlpatterns = [
     path('files/', views.file_list, name='file_list'),
     path('files/add/', views.add_file, name='add_file'),
     path('files/<int:pk>/edit/', views.edit_file, name='edit_file'),
-    path('files/<int:pk>/delete/', views.delete_file, name='delete_file'),
+    path('files/<int:pk>/delete/', views.delete_file, name='delete_file'),  
+    path('files/submission/', views.files_under_submission, name='files_submission'),
+    path('files/<int:pk>/send/', views.send_file, name='send_file'),
+    path('files/<int:pk>/receive/', views.receive_file, name='receive_file'),
 
     path('event/<int:pk>/edit/', views.edit_event, name='edit_event'),
     path('event/<int:pk>/delete/', views.delete_event, name='delete_event'),

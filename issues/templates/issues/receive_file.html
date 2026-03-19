@@ -1,0 +1,16 @@
+{% extends "issues/base.html" %}
+{% block content %}
+
+<h4>Receive File: {{ file }}</h4>
+
+<form method="post" class="card p-4 bg-white">
+{% csrf_token %}
+
+<label>Remark</label>
+<textarea name="remark" class="form-control mb-3"></textarea>
+
+<button class="btn btn-success">Receive</button>
+
+</form>
+
+{% endblock %}

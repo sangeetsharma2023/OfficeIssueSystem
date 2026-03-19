@@ -231,7 +231,12 @@ def global_search(request):
 
 @login_required
 def file_list(request):
+    status = request.GET.get('movement')
+
+    
     files = File.objects.all().order_by('-created_at')
+    if status:
+        files = files.filter(movement_status=status)
     return render(request, 'issues/file_list.html', {'files': files})
 
 
@@ -359,3 +364,47 @@ def delete_event(request, pk):
         return redirect('issue_detail', pk=issue_pk)
 
     return render(request, 'issues/delete_event.html', {'event': event})
+
+
+from django.utils import timezone
+
+@login_required
+def send_file(request, pk):
+    file = get_object_or_404(File, pk=pk)
+
+    if request.method == 'POST':
+        remark = request.POST.get('remark')
+
+        file.movement_status = 'sent'
+        file.last_movement_date = timezone.now()
+        file.last_movement_remark = remark
+        file.save()
+
+        return redirect('file_list')
+
+    return render(request, 'issues/send_file.html', {'file': file})
+
+
+@login_required
+def receive_file(request, pk):
+    file = get_object_or_404(File, pk=pk)
+
+    if request.method == 'POST':
+        remark = request.POST.get('remark')
+
+        file.movement_status = 'received'
+        file.last_movement_date = timezone.now()
+        file.last_movement_remark = remark
+        file.save()
+
+        return redirect('file_list')
+
+    return render(request, 'issues/receive_file.html', {'file': file})
+
+@login_required
+def files_under_submission(request):
+    files = File.objects.filter(movement_status='sent').order_by('-last_movement_date')
+
+    return render(request, 'issues/files_submission.html', {
+        'files': files
+    })

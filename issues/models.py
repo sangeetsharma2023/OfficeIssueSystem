@@ -32,7 +32,19 @@ class File(models.Model):
 
     physical_location = models.CharField(max_length=200, blank=True)
     section = models.CharField(max_length=200, blank=True)
+    MOVEMENT_STATUS = [
+        ('received', 'Received'),
+        ('sent', 'Sent'),
+    ]
 
+    movement_status = models.CharField(
+        max_length=10,
+        choices=MOVEMENT_STATUS,
+        default='received'
+    )
+
+    last_movement_date = models.DateTimeField(null=True, blank=True)
+    last_movement_remark = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
 
     open_date = models.DateField(null=True, blank=True)

@@ -8,6 +8,23 @@
         <i class="bi bi-plus-circle"></i> New File
     </a>
 </div>
+<div class="mb-3">
+    <a href="{% url 'file_list' %}" class="btn btn-outline-secondary btn-sm">
+        All
+    </a>
+
+    <a href="?movement=received" class="btn btn-outline-success btn-sm">
+        Received
+    </a>
+
+    <a href="?movement=sent" class="btn btn-outline-danger btn-sm">
+        Sent
+    </a>
+
+    <a href="{% url 'files_submission' %}" class="btn btn-outline-primary btn-sm">
+        Under Submission
+    </a>
+</div>
 
 <table class="table table-bordered bg-white">
     <tr>
@@ -15,6 +32,9 @@
         <th>Name</th>
         <th>Year</th>
         <th>Status</th>
+        <th>Movement Status</th>
+        <th>Last Movement</th>
+        <th>Remark</th>
         <th>Location</th>
         <th>Actions</th>
     </tr>
@@ -25,6 +45,16 @@
         <td>{{ f.name }}</td>
         <td>{{ f.year }}</td>
         <td><span class="badge bg-info">{{ f.status }}</span></td>
+        <td>
+            {% if f.movement_status == 'sent' %}
+                <span class="badge bg-danger">Sent</span>
+            {% else %}
+                <span class="badge bg-success">Received</span>
+            {% endif %}
+        </td>
+
+        <td>{{ f.last_movement_date|date:"d M Y H:i" }}</td>
+        <td>{{ f.last_movement_remark }}</td>
         <td>{{ f.physical_location }}</td>
 
         <td>
@@ -35,6 +65,15 @@
             <a href="{% url 'delete_file' f.pk %}" class="btn btn-sm btn-danger">
                 <i class="bi bi-trash"></i>
             </a>
+            {% if f.movement_status == 'received' %}
+                <a href="{% url 'send_file' f.pk %}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-arrow-right"></i> Send
+                </a>
+            {% else %}
+                <a href="{% url 'receive_file' f.pk %}" class="btn btn-sm btn-success">
+                    <i class="bi bi-arrow-left"></i> Receive
+                </a>
+            {% endif %}
         </td>
     </tr>
     {% endfor %}
